@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+        crossorigin="anonymous"></script>
+    <title>Verifica Transacción</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-sm12 col-md-6 col-lg-5">
+                <h1>Verifica Transacción</h1>
+            </div>
+        </div>
+        <div class="row">
+            <form class="col-12 col-sm12 col-md-6 col-lg-5" method="POST" action="/consumer">
+                <div class="mb-3">
+                    <label for="PAN" class="form-label">PAN</label>
+                    <input type="text" id="PAN" name="PAN" class="form-control" maxlength="16" />
+                </div>
+                <div class="mb-3">
+                    <label for="ExpirationMonth" class="form-label">Mes Vencimiento</label>
+                    <select class="form-select" id="ExpirationMonth" name="ExpirationMonth">
+                        <option selected>Seleccione</option>
+                        {% for i, month in enumerate(months, start = 1) %}
+                        <option value="{{ i }}">{{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="ExpirationYear" class="form-label">Año Vencimiento</label>
+                    <select class="form-select" id="ExpirationYear" name="ExpirationYear">
+                        <option selected>Seleccione</option>
+                        {% for i in range(year, year + 10, 1) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="SecurityCode" class="form-label">Código de seguridad</label>
+                    <input type="number" id="SecurityCode" name="SecurityCode" class="form-control" max="999"
+                        min="100" />
+                </div>
+                <div class="mb-3">
+                    <label for="CardBrand" class="form-label">Tipo</label>
+                    <select class="form-select" id="CardBrand" name="CardBrand">
+                        <option selected>Seleccione</option>
+                        <option value="Visa">Visa</option>
+                        <option value="Mastercard">Mastercard</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Contraseña</label>
+                    <input type="password" id="Password" name="Password" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="TransactionAmount" class="form-label">Monto</label>
+                    <input type="number" id="TransactionAmount" name="TransactionAmount" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <input type="submit" class="btn btn-primary" value="Enviar" />
+                </div>
+            </form>
+        </div>
+        {% if result %}
+            <div class="modal fade" id="transactionResult" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="transactionResultLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="transactionResultLabel">Resultado</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% if result == '00' %}
+                                <strong>Aprobada sin incidentes</strong>
+                            {% elif result == '01' %}
+                                <strong>Aprobada pronta a vencer</strong>
+                            {% elif result == '10' %}
+                                <strong>Rechazada, tarjeta no existe</strong>
+                            {% elif result == '11' %}
+                                <strong>Rechazada, falta de fondos</strong>
+                            {% elif result == '12' %}
+                                <strong>Rechazada, tarjeta bloqueada</strong>
+                            {% elif result == '13' %}
+                                <strong>Rechazada, tarjeta vencida</strong>
+                            {% elif result == '14' %}
+                                <strong>Rechazada, contraseña incorrecta</strong>
+                            {% elif result == '15' %}
+                                <strong>Rechazada, datos erróneos</strong>
+                            {% elif result == '16' %}
+                                <strong>Error en el web service</strong>
+                            {% elif result == 'er' %}
+                                <strong>Error al enviar solicitud</strong>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                let modal = new bootstrap.Modal(document.getElementById('transactionResult'));
+                modal.show();
+            </script>
+        {% endif %}
+    </div>
+</body>
+
+</html>
